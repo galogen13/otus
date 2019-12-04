@@ -7,7 +7,6 @@ import (
 
 func main() {
 	time, err := ntp.Time("0.beevik-ntp.pool.ntp.org")
-	//time, err := ntp.Time("time.nist.gov")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
