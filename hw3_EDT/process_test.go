@@ -2,8 +2,6 @@ package main
 
 import "testing"
 
-
-
 func TestProcess1(t *testing.T) {
 
 	type result struct {
