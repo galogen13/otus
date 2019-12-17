@@ -18,25 +18,26 @@ func main() {
 //Слова упорядочены в порядке убывания частотности #
 func Top10(str string) []string {
 
-	const top = 10
+	top := 10
 
 	wordMap := map[string]int{}
-	result := []string{}
 
-	// Разбивает фразу на слайс фраз по разделителю " ", добавляет полученные фразы в словарь, увеличивая счетчик
-	words := strings.Split(str, " ")
+	str = strings.ToLower(str)
+
+	f := func(c rune) bool {
+		return !unicode.IsLetter(c) && !unicode.IsNumber(c)
+	}
+	words := strings.FieldsFunc(str, f)
+
 	for _, word := range words {
-		processedWord := processWord(word)
-		if processedWord != "" {
-			wordMap[processedWord]++
-		}
+		wordMap[word]++
 	}
 
 	type wordCount struct {
 		word  string
 		count int
 	}
-	wordSlice := []wordCount{}
+	wordSlice := make([]wordCount, 0, len(wordMap))
 
 	for key, value := range wordMap {
 		wordSlice = append(wordSlice, wordCount{key, value})
@@ -46,21 +47,15 @@ func Top10(str string) []string {
 		return wordSlice[i].count > wordSlice[j].count
 	})
 
-	i := 0
-	for i < top && i < len(wordSlice) {
+	wordSliceLength := len(wordSlice)
+	if top > wordSliceLength {
+		top = wordSliceLength
+	}
+
+	result := make([]string, 0, top)
+	for i := 0; i < top; i++ {
 		result = append(result, wordSlice[i].word)
-		i++
 	}
 
 	return result
-}
-
-// Приводит фразу к нижнему регистру и убирает все знаки препинания в конце
-func processWord(word string) string {
-	word = strings.ToLower(word)
-	runes := []rune(word)
-	for len(runes) != 0 && unicode.IsPunct(runes[len(runes)-1]) {
-		runes = runes[:len(runes)-1]
-	}
-	return string(runes)
 }

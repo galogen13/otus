@@ -29,20 +29,3 @@ func TestTop10(t *testing.T) {
 	}
 
 }
-
-func TestProcessWord(t *testing.T) {
-
-	testSeq := map[string]string{
-		"Cat!.,":     "cat",
-		"CAT":        "cat",
-		"cAt,,,,,,,": "cat",
-	}
-
-	for key, value := range testSeq {
-		result := processWord(key)
-		if value != result {
-			t.Fatalf("EXPECTED STR %s RESULT STR %s", value, result)
-		}
-	}
-
-}
