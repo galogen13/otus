@@ -14,13 +14,13 @@ func main() {
 	err := 0
 
 	start = "a4bc2d5eg\\f3"
-	res, err = Process(start)
+	res, err = Unpack(start)
 	fmt.Println(start, res, err)
 
 }
 
-// Process  #
-func Process(str string) (string, int) {
+// Unpack  #
+func Unpack(str string) (string, int) {
 	const escapeSymbol = '\\'
 	runes := []rune(str)
 	strLen := len(runes)
