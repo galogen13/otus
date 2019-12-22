@@ -36,8 +36,9 @@ func TestFirst(t *testing.T) {
 		t.Fatalf("NOT EMPTY LIST Expected ERR %t Result ERR %t", true, ok)
 	}
 
-	if first.Value() != 1 {
-		t.Fatalf("Expected value %d Result value %d", 1, first.Value())
+	expectedValue := 1
+	if first.Value() != expectedValue {
+		t.Fatalf("Expected value %d Result value %d", expectedValue, first.Value())
 	}
 }
 
@@ -56,8 +57,9 @@ func TestLast(t *testing.T) {
 		t.Fatalf("NOT EMPTY LIST Expected ERR %t Result ERR %t", true, ok)
 	}
 
-	if last.Value() != 2 {
-		t.Fatalf("Expected value %d Result value %d", 1, last.Value())
+	expectedValue := 2
+	if last.Value() != expectedValue {
+		t.Fatalf("Expected value %d Result value %d", expectedValue, last.Value())
 	}
 }
 
@@ -68,13 +70,15 @@ func TestPushFront(t *testing.T) {
 	list.PushFront(2)
 	list.PushFront(1)
 
-	if list.Len() != 2 {
-		t.Fatalf("Expected Len %d Result len %d", 2, list.Len())
+	expLen := 2
+	if list.Len() != expLen {
+		t.Fatalf("Expected Len %d Result len %d", expLen, list.Len())
 	}
 
 	item, _ := list.First()
-	if item.Value() != 1 {
-		t.Fatalf("Expected value %d Result value %d", 1, item.Value())
+	expValue := 1
+	if item.Value() != expValue {
+		t.Fatalf("Expected value %d Result value %d", expValue, item.Value())
 	}
 }
 
@@ -85,13 +89,15 @@ func TestPushBack(t *testing.T) {
 	list.PushBack(2)
 	list.PushBack(1)
 
-	if list.Len() != 2 {
-		t.Fatalf("Expected Len %d Result len %d", 2, list.Len())
+	expLen := 2
+	if list.Len() != expLen {
+		t.Fatalf("Expected Len %d Result len %d", expLen, list.Len())
 	}
 
 	item, _ := list.Last()
-	if item.Value() != 1 {
-		t.Fatalf("Expected value %d Result value %d", 1, item.Value())
+	expValue := 1
+	if item.Value() != expValue {
+		t.Fatalf("Expected value %d Result value %d", expValue, item.Value())
 	}
 }
 
