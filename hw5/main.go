@@ -13,15 +13,15 @@ func main() {
 	list.PushFront(3)
 	list.PushBack(0)
 
-	first, _ := list.First()
-	list.Remove(first)
-	first, _ = list.First()
-	list.Remove(first)
-	last, _ := list.Last()
-	list.Remove(last)
+	first := list.First()
+	list.Remove(*first)
+	first = list.First()
+	list.Remove(*first)
+	last := list.Last()
+	list.Remove(*last)
 
-	first, _ = list.First()
-	list.Remove(first)
+	first = list.First()
+	list.Remove(*first)
 
 	fmt.Println(list.First())
 
@@ -61,37 +61,22 @@ func (list List) Len() int {
 	return list.len
 }
 
-// First - возвращает первый элемент списка и булево значение(Ложь - если список пустой, иначе Истина)#
-func (list List) First() (item Item, isExists bool) {
-	if list.first == nil {
-		item = Item{}
-	} else {
-		item = *(list.first)
-		isExists = true
-	}
-	return
+// First - возвращает указатель на первый элемент списка#
+func (list List) First() *Item {
+	return list.first
 }
 
-// Last - возвращает последний элемент списка и булево значение(Ложь - если список пустой, иначе Истина)#
-func (list List) Last() (item Item, isExists bool) {
-	if list.last == nil {
-		item = Item{}
-	} else {
-		item = *(list.last)
-		isExists = true
-	}
-	return
+// Last - возвращает указатель на последний элемент списка#
+func (list List) Last() *Item {
+	return list.last
 }
 
 // PushFront - добавляет в начало списка элемент #
 func (list *List) PushFront(v interface{}) {
-	var newFirst Item
+	newFirst := Item{value: v}
 	if list.first != nil {
-		newFirst = Item{value: v, next: list.first}
+		newFirst.next = list.first
 		list.first.prev = &newFirst
-
-	} else {
-		newFirst = Item{value: v}
 	}
 	if list.Len() == 0 {
 		list.last = &newFirst
@@ -102,12 +87,10 @@ func (list *List) PushFront(v interface{}) {
 
 // PushBack - добавляет в конец списка элемент #
 func (list *List) PushBack(v interface{}) {
-	var newLast Item
+	newLast := Item{value: v}
 	if list.last != nil {
-		newLast = Item{value: v, prev: list.last}
+		newLast.prev = list.last
 		list.last.next = &newLast
-	} else {
-		newLast = Item{value: v, prev: nil}
 	}
 
 	if list.Len() == 0 {
@@ -122,30 +105,28 @@ func (list *List) Remove(i Item) {
 	switch {
 	// Если известен предудыщий и следующий - сошьем их
 	case i.next != nil && i.prev != nil:
-		{
-			i.prev.next = i.next
-			i.next.prev = i.prev
-		}
+
+		i.prev.next = i.next
+		i.next.prev = i.prev
 
 	// Если удаляется крайний элемент, то предкрайний должен стать крайним
 	case i.next == nil && i.prev != nil:
-		{
-			i.prev.next = nil
-			list.last = i.prev
-		}
+
+		i.prev.next = nil
+		list.last = i.prev
 
 	// Если удаляется первый элемент, то второй должен стать первым
 	case i.next != nil && i.prev == nil:
-		{
-			i.next.prev = nil
-			list.first = i.next
-		}
+
+		i.next.prev = nil
+		list.first = i.next
+
 	// Если это последний элемент в списке, очищаем первого и последнего в списке
 	case i.next == nil && i.prev == nil:
-		{
-			list.first = nil
-			list.last = nil
-		}
+
+		list.first = nil
+		list.last = nil
+
 	}
 
 	list.len--

@@ -11,8 +11,8 @@ func TestLen(t *testing.T) {
 	list.PushFront(2)
 	list.PushFront(3)
 	list.PushBack(0)
-	firstItem, _ := list.First()
-	list.Remove(firstItem)
+	firstItem := list.First()
+	list.Remove(*firstItem)
 	listLen := list.Len()
 	expectedLen := 3
 	if listLen != expectedLen {
@@ -24,16 +24,16 @@ func TestLen(t *testing.T) {
 func TestFirst(t *testing.T) {
 
 	list := List{}
-	_, ok := list.First()
-	if ok {
-		t.Fatalf("EMPTY LIST Expected ERR %t Result ERR %t", false, ok)
+	first := list.First()
+	if first != nil {
+		t.Fatalf("EMPTY LIST Expected first %#v Result first %p", nil, first)
 	}
 
 	list.PushFront(2)
 	list.PushFront(1)
-	first, ok := list.First()
-	if !ok {
-		t.Fatalf("NOT EMPTY LIST Expected ERR %t Result ERR %t", true, ok)
+	first = list.First()
+	if first == nil {
+		t.Fatalf("NOT EMPTY LIST Expected first %p Result first %p", list.first, first)
 	}
 
 	expectedValue := 1
@@ -45,16 +45,16 @@ func TestFirst(t *testing.T) {
 func TestLast(t *testing.T) {
 
 	list := List{}
-	_, ok := list.Last()
-	if ok {
-		t.Fatalf("EMPTY LIST Expected ERR %t Result ERR %t", false, ok)
+	last := list.Last()
+	if last != nil {
+		t.Fatalf("EMPTY LIST Expected last %#v Result last %p", nil, last)
 	}
 
 	list.PushFront(2)
 	list.PushFront(1)
-	last, ok := list.Last()
-	if !ok {
-		t.Fatalf("NOT EMPTY LIST Expected ERR %t Result ERR %t", true, ok)
+	last = list.Last()
+	if last == nil {
+		t.Fatalf("NOT EMPTY LIST Expected last %p Result last %p", list.last, last)
 	}
 
 	expectedValue := 2
@@ -75,7 +75,7 @@ func TestPushFront(t *testing.T) {
 		t.Fatalf("Expected Len %d Result len %d", expLen, list.Len())
 	}
 
-	item, _ := list.First()
+	item := list.First()
 	expValue := 1
 	if item.Value() != expValue {
 		t.Fatalf("Expected value %d Result value %d", expValue, item.Value())
@@ -94,7 +94,7 @@ func TestPushBack(t *testing.T) {
 		t.Fatalf("Expected Len %d Result len %d", expLen, list.Len())
 	}
 
-	item, _ := list.Last()
+	item := list.Last()
 	expValue := 1
 	if item.Value() != expValue {
 		t.Fatalf("Expected value %d Result value %d", expValue, item.Value())
@@ -108,8 +108,8 @@ func TestRemove(t *testing.T) {
 	list.PushFront(1)
 	list.PushFront(2)
 	list.PushFront(3)
-	item, _ := list.First()
-	list.Remove(item)
+	item := list.First()
+	list.Remove(*item)
 
 	expectedLen := 2
 	if list.Len() != expectedLen {
@@ -117,7 +117,7 @@ func TestRemove(t *testing.T) {
 	}
 
 	expectedValue := 2
-	item, _ = list.First()
+	item = list.First()
 	if item.Value() != expectedValue {
 		t.Fatalf("Expected value %d Result value %d", expectedValue, item.Value())
 	}
@@ -129,7 +129,7 @@ func TestValue(t *testing.T) {
 
 	expectedValue := 1
 	list.PushFront(expectedValue)
-	item, _ := list.First()
+	item := list.First()
 
 	if item.Value() != expectedValue {
 		t.Fatalf("Expected value %d Result value %d", expectedValue, item.Value())
@@ -142,7 +142,7 @@ func TestNext(t *testing.T) {
 
 	list.PushFront(1)
 	list.PushFront(2)
-	first, _ := list.First()
+	first := list.First()
 
 	if list.last != first.Next() {
 		t.Fatalf("Expected value %p Result value %p", list.last, first.Next())
@@ -156,7 +156,7 @@ func TestPrev(t *testing.T) {
 
 	list.PushFront(1)
 	list.PushFront(2)
-	last, _ := list.Last()
+	last := list.Last()
 
 	if list.first != last.Prev() {
 		t.Fatalf("Expected value %p Result value %p", list.first, last.Prev())
