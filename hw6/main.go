@@ -50,6 +50,7 @@ func Run(task []func() error, N int, M int) (err error) {
 			}
 		default:
 		}
+
 		if i < taskCount {
 			select {
 			case tasksCh <- task[i]:
