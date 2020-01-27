@@ -27,6 +27,9 @@ func Run(tasks []func() error, N int, M int) (err error) {
 			M--
 		default:
 		}
+		if M <= 0 {
+			break
+		}
 		select {
 		case <-errCh:
 			M--
