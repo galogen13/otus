@@ -23,7 +23,7 @@ func TestRun(t *testing.T) {
 		tasks = append(tasks, f)
 	}
 
-	err := Run(tasks, 5, 10)
+	err := Run(tasks, 5, 3)
 	if err == nil {
 		t.Fatalf("ERR is empty")
 	}

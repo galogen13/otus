@@ -3,80 +3,52 @@ package main
 import (
 	"errors"
 	_ "fmt"
+	"sync"
 )
 
 // Run .
-func Run(task []func() error, N int, M int) (err error) {
+func Run(tasks []func() error, N int, M int) (err error) {
+	wg := sync.WaitGroup{}
+	wg.Add(N)
+	taskCh := make(chan func() error)
+	errCh := make(chan error, len(tasks))
 
-	startCh := make(chan interface{})
-	resultCh := make(chan error, len(task))
+	for i := 0; i < N; i++ {
+		go func() {
+			worker(taskCh, errCh)
+			wg.Done()
+		}()
+	}
 
 	i := 0
-	taskCount := len(task)
-	maxGoroutines := min(N, taskCount)
-
-	tasksCh := make(chan func() error, maxGoroutines)
-
-	// Подготавливаем к запуску первые maxGoroutines функций
-	for i < maxGoroutines {
-		f := task[i]
-		tasksCh <- f
-		go func() {
-			<-startCh
-			execTask(tasksCh, resultCh)
-		}()
-
-		i++
-	}
-	close(startCh)
-
-	finishedTasks := 0
-
-	for {
+	for M > 0 && i < len(tasks) {
 		select {
-
-		case res := <-resultCh:
-			if res != nil {
-				M--
-			}
-			if M == 0 {
-				close(tasksCh)
-				err = errors.New("Too much errors")
-				return err
-			}
-			finishedTasks++
-			if finishedTasks == taskCount {
-				return
-			}
+		case <-errCh:
+			M--
 		default:
 		}
-
-		if i < taskCount {
-			select {
-			case tasksCh <- task[i]:
-				go func() {
-					execTask(tasksCh, resultCh)
-				}()
-				i++
-			default:
-			}
+		select {
+		case <-errCh:
+			M--
+		case taskCh <- tasks[i]:
+			i++
 		}
-
 	}
 
+	close(taskCh)
+	wg.Wait()
+	close(errCh)
+	if M <= 0 {
+		err = errors.New("Too much errors")
+	}
+	return
 }
 
-func execTask(tasksCh <-chan func() error, resultCh chan<- error) {
-	f, ok := <-tasksCh
-	if ok {
-		res := f()
-		resultCh <- res
+func worker(taskCh chan func() error, errCh chan error) {
+	for task := range taskCh {
+		err := task()
+		if err != nil {
+			errCh <- err
+		}
 	}
-}
-
-func min(x, y int) int {
-	if x < y {
-		return x
-	}
-	return y
 }
