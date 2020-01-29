@@ -46,7 +46,7 @@ func TestRun(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ERR is not empty")
 	}
-	if CompletedTasks < len(tasks){
+	if CompletedTasks != len(tasks){
 		t.Fatalf("Completed tasks: %d; exp completed tasks: %d", CompletedTasks, len(tasks))	
 	}
 
@@ -54,6 +54,9 @@ func TestRun(t *testing.T) {
 	err = Run(tasks, 0, 0)
 	if err != nil {
 		t.Fatalf("ERR is not empty")
+	}
+	if CompletedTasks != len(tasks){
+		t.Fatalf("Completed tasks: %d; exp completed tasks: %d", CompletedTasks, len(tasks))	
 	}
 
 }
