@@ -3,11 +3,13 @@ package main
 import (
 	"errors"
 	"fmt"
+	"sync"
 	"testing"
 	"time"
 )
 
-var CompletedTasks int = 0 
+var CompletedTasks int = 0
+var mux = &sync.Mutex{}
 
 func TestRun(t *testing.T) {
 
@@ -30,8 +32,8 @@ func TestRun(t *testing.T) {
 	if err == nil {
 		t.Fatalf("ERR is empty")
 	}
-	if CompletedTasks >= 5+5{
-		t.Fatalf("Too much completed tasks: %d", CompletedTasks)	
+	if CompletedTasks >= 5+5 {
+		t.Fatalf("Too much completed tasks: %d", CompletedTasks)
 	}
 
 	tasks = tasks[:0]
@@ -46,8 +48,8 @@ func TestRun(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ERR is not empty")
 	}
-	if CompletedTasks != len(tasks){
-		t.Fatalf("Completed tasks: %d; exp completed tasks: %d", CompletedTasks, len(tasks))	
+	if CompletedTasks != len(tasks) {
+		t.Fatalf("Completed tasks: %d; exp completed tasks: %d", CompletedTasks, len(tasks))
 	}
 
 	CompletedTasks = 0
@@ -55,8 +57,8 @@ func TestRun(t *testing.T) {
 	if err != nil {
 		t.Fatalf("ERR is not empty")
 	}
-	if CompletedTasks != len(tasks){
-		t.Fatalf("Completed tasks: %d; exp completed tasks: %d", CompletedTasks, len(tasks))	
+	if CompletedTasks != len(tasks) {
+		t.Fatalf("Completed tasks: %d; exp completed tasks: %d", CompletedTasks, len(tasks))
 	}
 
 }
@@ -66,7 +68,9 @@ func FailFunc() func() error {
 	return func() error {
 		time.Sleep(time.Second)
 		fmt.Println("FAIL")
+		mux.Lock()
 		CompletedTasks++
+		mux.Unlock()
 		return errors.New("Fail")
 	}
 
@@ -78,7 +82,9 @@ func OkFunc() func() error {
 		var err error
 		time.Sleep(time.Second)
 		fmt.Println("OK")
+		mux.Lock()
 		CompletedTasks++
+		mux.Unlock()
 		return err
 	}
 
