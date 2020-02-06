@@ -50,6 +50,8 @@ func Run(tasks []func() error, N int, M int) (err error) {
 
 	close(taskCh)
 	wg.Wait()
+	// Оставшиеся задачи выполнены, len(errCh) больше не изменится, поэтому можно прочесть его длину
+	M = M - len(errCh)
 	close(errCh)
 	if M <= 0 {
 		err = errors.New("Too much errors")
