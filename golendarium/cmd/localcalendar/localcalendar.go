@@ -1,21 +1,24 @@
-package main
+package localcalendar
 
-import cal "github.com/galogen13/otus/golendarium/calendar"
+import "github.com/galogen13/otus/golendarium/cmd/calendar"
 
 // Calendar1 .
-type Calendar1 struct {
-	events []cal.Event
+type LocalCalendar struct {
+	events []calendar.Event
 }
 
 // AddEvent .
-func (cal *Calendar1) AddEvent(event cal.Event) error {
-	// проверка на существование
-	cal.events = append(cal.events, event)
+func (cal *LocalCalendar) AddEvent(newEvent calendar.Event) error {
+	err := checkDateBusy(cal.events, newEvent)
+	if err != nil {
+		return err
+	}
+	cal.events = append(cal.events, newEvent)
 	return nil
 }
 
 // DeleteEvent .
-func (cal *Calendar1) DeleteEvent(id string) error {
+func (cal *LocalCalendar) DeleteEvent(id string) error {
 
 	for i := 0; i < len(cal.events); i++ {
 		if cal.events[i].ID == id {
@@ -24,11 +27,43 @@ func (cal *Calendar1) DeleteEvent(id string) error {
 		}
 	}
 
+	return calendar.ErrEventNotExist
+}
+
+func (cal *LocalCalendar) EditEvent(id string, event calendar.Event) error {
+
+	err := cal.DeleteEvent(id)
+	if err != nil {
+		return err
+	}
+
+	event.ID = id
+	err = cal.AddEvent(event)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-// (cal *Calendar) EditEvent(id string, event Event) error
-// (cal *Calendar) GetEvent(id string) (event Event, err error)
-// (cal *Calendar) List() []Event
+func (cal LocalCalendar) GetEvent(id string) (event calendar.Event, err error) {
+	for _, event := range cal.events {
+		if event.ID == id {
+			return event, nil
+		}
+	}
+	return calendar.Event{}, calendar.ErrEventNotExist
+}
 
-//var Store []Event
+func (cal LocalCalendar) List() []calendar.Event {
+	return cal.events
+}
+
+func checkDateBusy(events []calendar.Event, newEvent calendar.Event) error {
+	for _, event := range events {
+		if newEvent.Start.After(event.Start) && event.Finish.After(newEvent.Start) || newEvent.Finish.After(event.Start) && event.Finish.After(newEvent.Finish) || newEvent.Start.After(event.Start) && event.Finish.After(newEvent.Finish) {
+			return calendar.ErrDateBusy
+		}
+	}
+	return nil
+}
