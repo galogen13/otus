@@ -1,7 +1,7 @@
 package localcalendar
 
 import (
-	"github.com/galogen13/otus/golendarium/cmd/calendar"
+	"github.com/galogen13/otus/golendarium/pkg/calendar"
 	"reflect"
 	"testing"
 	"time"
@@ -9,8 +9,7 @@ import (
 
 func TestLen(t *testing.T) {
 
-	var cal calendar.Calendar
-	cal = &LocalCalendar{}
+	cal := NewLocalCalendar()
 
 	event1, _ := calendar.NewEvent(
 		time.Date(2020, 03, 1, 20, 34, 58, 0, time.UTC),
@@ -18,7 +17,7 @@ func TestLen(t *testing.T) {
 		"Mew event 1",
 		"new event descr 1")
 
-	err := cal.AddEvent(event1)
+	err := cal.AddEvent(*event1)
 	if err != nil {
 		t.Fatalf("EXPECTED nil error RESULT %s", err)
 	}
@@ -32,7 +31,7 @@ func TestLen(t *testing.T) {
 		"Mew event 2",
 		"new event descr 2")
 
-	err = cal.AddEvent(event2)
+	err = cal.AddEvent(*event2)
 	if err != calendar.ErrDateBusy {
 		t.Fatalf("EXPECTED %s RESULT %s", calendar.ErrDateBusy, err)
 	}
@@ -46,7 +45,7 @@ func TestLen(t *testing.T) {
 		"Mew event 3",
 		"new event descr 3")
 
-	_ = cal.AddEvent(event3)
+	_ = cal.AddEvent(*event3)
 	findEvent, err := cal.GetEvent(event1.ID)
 	if !reflect.DeepEqual(event1, findEvent) {
 		t.Fatalf("GetEvent EXPECTED %s RESULT %s", event1, findEvent)
@@ -72,17 +71,17 @@ func TestLen(t *testing.T) {
 		"new event descr 3 edited")
 	event3Edited.ID = event3.ID
 
-	err = cal.EditEvent("123123123123123123", event3Edited)
+	err = cal.EditEvent("123123123123123123", *event3Edited)
 	if err != calendar.ErrEventNotExist {
 		t.Fatalf("EXPECTED %s RESULT %s", calendar.ErrEventNotExist, err)
 	}
 
-	err = cal.EditEvent(event3.ID, event3Edited)
+	err = cal.EditEvent(event3.ID, *event3Edited)
 	if err != nil {
 		t.Fatalf("EXPECTED nil error RESULT %s", err)
 	}
 	event3Find, _ := cal.GetEvent(event3.ID)
-	if !reflect.DeepEqual(event3Find, event3Edited) {
+	if !reflect.DeepEqual(*event3Find, *event3Edited) {
 		t.Fatalf("EXPECTED %s RESULT %s", event3Edited, event3Find)
 	}
 

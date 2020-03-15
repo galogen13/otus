@@ -22,7 +22,7 @@ var ErrEmptyFinishTime = errors.New("Empty finish time")
 // ErrEventNotExist .
 var ErrEventNotExist = errors.New("Event not exist")
 
-// ErrDateBusy .
+// ErrBadStartFinish .
 var ErrBadStartFinish = errors.New("Start date is greater than finish date")
 
 // Calendar .
@@ -30,7 +30,7 @@ type Calendar interface {
 	AddEvent(event Event) error
 	DeleteEvent(id string) error
 	EditEvent(id string, event Event) error
-	GetEvent(id string) (event Event, err error)
+	GetEvent(id string) (event *Event, err error)
 	List() []Event
 }
 
@@ -42,23 +42,23 @@ type Event struct {
 }
 
 // NewEvent .
-func NewEvent(start, finish time.Time, name, descr string) (Event, error) {
+func NewEvent(start, finish time.Time, name, descr string) (*Event, error) {
 
 	if name == "" {
-		return Event{}, ErrEmptyName
+		return nil, ErrEmptyName
 	}
 
 	if start.IsZero() {
-		return Event{}, ErrEmptyStartTime
+		return nil, ErrEmptyStartTime
 	}
 
 	if finish.IsZero() {
-		return Event{}, ErrEmptyFinishTime
+		return nil, ErrEmptyFinishTime
 	}
 
 	if start.After(finish) || start.Equal(finish) {
-		return Event{}, ErrBadStartFinish
+		return nil, ErrBadStartFinish
 	}
 
-	return Event{ID: sid.Id(), Start: start, Finish: finish, Name: name, Descr: descr}, nil
+	return &Event{ID: sid.Id(), Start: start, Finish: finish, Name: name, Descr: descr}, nil
 }

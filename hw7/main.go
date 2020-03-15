@@ -79,9 +79,9 @@ func Copy(from string, to string, limit int64, offset int64) (err error) {
 	bar.Set(pb.Bytes, true)
 	bar.Set(pb.SIBytesPrefix, true)
 	bar.SetWriter(os.Stdout)
-	//bar.Set(pb.Static, true)
+	bar.Set(pb.Static, true)
 	bar.Start()
-	//bar.Write()
+	bar.Write()
 
 	resFile, _ := os.Create(to)
 	if err != nil {
@@ -110,7 +110,7 @@ func Copy(from string, to string, limit int64, offset int64) (err error) {
 		if err != nil {
 			return fmt.Errorf("failed to write: %v", err)
 		}
-		//bar.Write()
+		bar.Write()
 	}
 	resFile.Close()
 	bar.Finish()
