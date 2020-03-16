@@ -1,34 +1,72 @@
 package main
 
 import (
+	"flag"
 	"fmt"
-	"os"
+	"io/ioutil"
+	"log"
+	"net/http"
 
-	"time"
+	"gopkg.in/yaml.v2"
 
-	cal "github.com/galogen13/otus/golendarium/pkg/calendar"
-	loccal "github.com/galogen13/otus/golendarium/pkg/localcalendar"
+	"go.uber.org/zap"
 )
 
 func main() {
 
-	calend := loccal.NewLocalCalendar()
-	event, err := cal.NewEvent(
-		time.Date(2020, 03, 1, 20, 34, 58, 0, time.UTC),
-		time.Date(2020, 03, 1, 21, 56, 0, 0, time.UTC),
-		"Mew event",
-		"new event descr")
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-	}
-	calend.AddEvent(*event)
-	err = calend.DeleteEvent("dflksdflksdmfkl")
-	fmt.Println(err)
-	fmt.Println(calend.List())
-	ev, err := calend.GetEvent(event.ID)
-	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-	}
-	fmt.Println(ev)
+	var config string
+	flag.StringVar(&config, "config", "", "Config file address")
+	flag.Parse()
 
+	var c Config
+	yamlFile, err := ioutil.ReadFile(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = yaml.Unmarshal(yamlFile, &c)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
+	}
+
+	//c := Config{"127.0.0.1", "9090", "./", "info"}
+
+	logCfg := zap.NewDevelopmentConfig()
+	logCfg.OutputPaths = []string{c.LogFile}
+	logCfg.Encoding = "json"
+	logger, err := logCfg.Build()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer logger.Sync()
+
+	loggerFunc := func(msg string, fields ...zap.Field) {
+		switch c.LogLevel {
+		case "warn":
+			logger.Warn(msg, fields...)
+		case "error":
+			logger.Error(msg, fields...)
+		case "info":
+			logger.Info(msg, fields...)
+		case "debug":
+			logger.Debug(msg, fields...)
+		default:
+			logger.Info(msg, fields...)
+		}
+		logger.Sync()
+	}
+
+	http.HandleFunc("/hello", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "Hello")
+		loggerFunc("Hello comes")
+
+	})
+	http.ListenAndServe(c.HttpListenIp+":"+c.HttpListenPort, nil)
+}
+
+// Config .
+type Config struct {
+	HttpListenIp   string `yaml:"listen_ip"`
+	HttpListenPort string `yaml:"listen_port"`
+	LogFile        string `yaml:"log_file"`
+	LogLevel       string `yaml:"log_level"`
 }
